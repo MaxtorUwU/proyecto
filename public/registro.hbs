@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Nuevo Usuario - Portal Estudiantil</title>
+    <link rel="stylesheet" href="Registro.css"> <style>
+        /* Basic CSS for presentation, assuming Registro.css has more */
+        body { font-family: sans-serif; margin: 0; background-color: #f4f4f4; color: #333; display: flex; flex-direction: column; min-height: 100vh; }
+        .navbar { background-color: #007bff; padding: 15px 0; }
+        .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .nav-logo { color: white; text-decoration: none; font-size: 1.5em; font-weight: bold; }
+        .nav-menu { list-style: none; margin: 0; padding: 0; display: flex; }
+        .nav-item { margin-left: 20px; }
+        .nav-link { color: white; text-decoration: none; padding: 5px 10px; border-radius: 4px; transition: background-color 0.3s ease; }
+        .nav-link:hover, .nav-link.active { background-color: #0056b3; }
+
+        .main-content-area {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .form-container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+        }
+
+        .form-title {
+            color: #333;
+            margin-bottom: 25px;
+            font-size: 1.8em;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="email"],
+        .form-group input[type="password"] {
+            width: calc(100% - 20px);
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+
+        .form-group input[type="checkbox"] {
+            margin-right: 10px;
+        }
+
+        .form-button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1.1em;
+            margin-top: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .form-button:hover {
+            background-color: #0056b3;
+        }
+
+        .form-switch {
+            margin-top: 20px;
+            font-size: 0.95em;
+        }
+
+        .form-switch a {
+            color: #28a745;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .form-switch a:hover {
+            text-decoration: underline;
+        }
+
+        .page-footer {
+            text-align: center;
+            padding: 20px;
+            margin-top: auto;
+            background-color: #333;
+            color: white;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/" class="nav-logo">MiPortalEstudiantil</a>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="/acceso" class="nav-link">Iniciar Sesión</a></li>
+                <li class="nav-item"><a href="/registro" class="nav-link active">Registrarse</a></li>
+                <li class="nav-item"><a href="/ayuda" class="nav-link">Ayuda</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="main-content-area">
+        <div class="form-container" id="register-container">
+            <h2 class="form-title">Crear Nueva Cuenta</h2>
+            <form id="registerForm" action="/register" method="POST">
+                {{! Optionally display server-side messages or errors }}
+                {{#if errorMessage}}
+                    <p style="color: red; margin-bottom: 15px;">{{errorMessage}}</p>
+                {{/if}}
+                {{#if successMessage}}
+                    <p style="color: green; margin-bottom: 15px;">{{successMessage}}</p>
+                {{/if}}
+
+                <div class="form-group">
+                    <label for="registerNombreCompleto">Nombre Completo:</label>
+                    <input type="text" id="registerNombreCompleto" name="fullName" placeholder="Tu nombre y apellidos" required value="{{oldData.fullName}}">
+                </div>
+
+                <div class="form-group">
+                    <label for="registerUsuario">Nombre de Usuario:</label>
+                    <input type="text" id="registerUsuario" name="username" placeholder="Elige un nombre de usuario" required value="{{oldData.username}}">
+                </div>
+
+                <div class="form-group">
+                    <label for="registerEmail">Email:</label>
+                    <input type="email" id="registerEmail" name="email" placeholder="tu_correo@ejemplo.com" required value="{{oldData.email}}">
+                </div>
+
+                <div class="form-group">
+                    <label for="registerPassword">Contraseña:</label>
+                    <input type="password" id="registerPassword" name="password" placeholder="Mínimo 6 caracteres" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">Confirmar Contraseña:</label>
+                    <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Repite la contraseña" required>
+                </div>
+
+                <div class="form-group">
+                    <input type="checkbox" id="acceptTerms" name="acceptTerms" required {{#if oldData.acceptTerms}}checked{{/if}}>
+                    <label for="acceptTerms">
+                        Acepto los <a href="/terminos" target="_blank">términos y condiciones</a>.
+                    </label>
+                </div>
+
+                <button type="submit" class="form-button">Registrarme</button>
+                <p class="form-switch">¿Ya tienes cuenta? <a href="/acceso">Inicia sesión aquí</a></p>
+            </form>
+        </div>
+    </div>
+
+    <footer class="page-footer">
+        <p>© 2023 Portal Estudiantil. Todos los derechos reservados.</p>
+    </footer>
+
+    <script>
+        const registerForm = document.getElementById('registerForm');
+        if (registerForm) {
+            registerForm.addEventListener('submit', function(event) {
+                const password = document.getElementById('registerPassword').value;
+                const confirmPassword = document.getElementById('confirmPassword').value;
+                const termsCheckbox = document.getElementById('acceptTerms');
+
+                // Client-side validation
+                if (password !== confirmPassword) {
+                    alert('Las contraseñas no coinciden.');
+                    event.preventDefault(); // Prevent form submission
+                    return;
+                }
+
+                if (password.length < 6) {
+                    alert('La contraseña debe tener al menos 6 caracteres.');
+                    event.preventDefault();
+                    return;
+                }
+
+                if (!termsCheckbox.checked) {
+                    alert('Debes aceptar los términos y condiciones para registrarte.');
+                    event.preventDefault();
+                    return;
+                }
+
+                // If all client-side validations pass, the form will submit to the server.
+                // Server-side validation is still critical!
+            });
+        }
+    </script>
+
+</body>
+</html>

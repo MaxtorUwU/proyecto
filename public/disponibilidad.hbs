@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disponibilidad de Asignaturas</title>
+    <link rel="stylesheet" href="Disponibilidad.css"> 
+    <style>
+        /* Basic CSS to make it presentable, assuming Disponibilidad.css has more */
+        body { font-family: sans-serif; margin: 20px; background-color: #f4f4f4; }
+        .title { text-align: center; color: #333; }
+        .content-container { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); max-width: 900px; margin: 20px auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .btn-inscribir {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .btn-inscribir:hover:not([disabled]) {
+            background-color: #0056b3;
+        }
+        .btn-inscribir[disabled] {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        .no-cupos {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1 class="title">Disponibilidad de Asignaturas</h1>
+
+    <div class="content-container">
+        <p style="text-align: center; margin-bottom: 20px;">
+            Selecciona las asignaturas que deseas inscribir para el próximo período.
+        </p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Asignatura</th>
+                    <th>Créditos</th>
+                    <th>Cupos Disponibles</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each courses}}
+                <tr>
+                    <td>{{this.code}}</td>
+                    <td>{{this.name}}</td>
+                    <td>{{this.credits}}</td>
+                    <td {{#if (eq this.available_slots 0)}}class="no-cupos"{{/if}}>
+                        {{this.available_slots}}
+                    </td>
+                    <td>
+                        {{#if (gt this.available_slots 0)}}
+                            <button class="btn-inscribir" data-course-id="{{this.id}}">Inscribir</button>
+                        {{else}}
+                            <button class="btn-inscribir" disabled>Completo</button>
+                        {{/if}}
+                    </td>
+                </tr>
+                {{/each}}
+            </tbody>
+        </table>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <button class="btn-inscribir" style="padding: 12px 30px; font-size: 1.1em;">Finalizar Inscripción</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const enrollUrl = 'http://localhost:3000/api/enroll'; // Your backend enrollment endpoint
+
+            // We no longer need to fetch initial courses from JavaScript because HBS does it
+            // However, if you want to update the table *after* an enrollment without a full page refresh,
+            // you'd still need a mechanism (like re-fetching via JS or updating specific cells).
+            // For this HBS example, we'll simplify the JS for enrollment post-render.
+
+            // Function to handle enrollment
+            async function handleEnrollment(event) {
+                const button = event.target;
+                const courseId = parseInt(button.dataset.courseId);
+                const originalText = button.textContent;
+
+                // Disable button and change text while processing
+                button.textContent = 'Inscribiendo...';
+                button.disabled = true;
+
+                try {
+                    const response = await fetch(enrollUrl, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ courseId: courseId }),
+                    });
+
+                    const result = await response.json();
+
+                    if (response.ok) {
+                        alert(result.message + ' Has inscrito la asignatura: ' + button.closest('tr').cells[1].textContent);
+                        // OPTIONAL: To update slots dynamically without full page refresh:
+                        // Find the available slots cell and decrement its value.
+                        const availableSlotsCell = button.closest('tr').cells[3];
+                        let currentSlots = parseInt(availableSlotsCell.textContent);
+                        if (currentSlots > 0) {
+                            currentSlots--;
+                            availableSlotsCell.textContent = currentSlots;
+                            if (currentSlots === 0) {
+                                availableSlotsCell.classList.add('no-cupos');
+                                button.textContent = 'Completo';
+                                button.disabled = true;
+                            } else {
+                                button.textContent = 'Inscrito'; // Or keep 'Inscribir' if multiple enrollments are allowed
+                                button.style.backgroundColor = '#28a745';
+                                button.style.color = '#ffffff';
+                            }
+                        }
+                    } else {
+                        alert('Error al inscribir: ' + result.message);
+                        button.textContent = originalText; // Revert button text
+                        button.disabled = false; // Re-enable button
+                    }
+                } catch (error) {
+                    console.error('Error during enrollment:', error);
+                    alert('Hubo un error al intentar inscribir la asignatura. Por favor, inténtalo de nuevo.');
+                    button.textContent = originalText; // Revert button text
+                    button.disabled = false; // Re-enable button
+                }
+            }
+
+            // Attach event listeners to all 'Inscribir' buttons
+            document.querySelectorAll('.btn-inscribir:not([disabled])').forEach(button => {
+                button.addEventListener('click', handleEnrollment);
+            });
+        });
+    </script>
+
+</body>
+</html>
