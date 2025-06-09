@@ -1,0 +1,117 @@
+/* Estilos Generales */
+body {
+  background-color: #fafafa; /* Fondo claro */
+  color: #333333; /* Texto oscuro */
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; /* Tipografía */
+  margin: 0;
+  padding: 20px;
+  line-height: 1.8; /* Espaciado entre líneas */
+}
+
+/* Contenedor de los formularios */
+.form-container {
+  padding: 30px 40px;
+  background-color: #ffffff; /* Fondo blanco para los formularios */
+  border-radius: 10px; /* Bordes redondeados */
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  width: 100%;
+  max-width: 500px; /* Ancho máximo */
+  margin-top: 30px; /* Separación superior */
+}
+
+/* Títulos del formulario */
+.form-title {
+  text-align: center;
+  color: #333333; /* Títulos en color oscuro */
+  font-size: 2.2em; /* Tamaño del título */
+  margin-bottom: 25px;
+  text-transform: uppercase; /* Título en mayúsculas */
+  letter-spacing: 2px; /* Espaciado entre letras */
+}
+
+/* Grupos de etiquetas e inputs */
+.form-group {
+  margin-bottom: 25px; /* Espacio entre los campos */
+}
+
+.form-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 8px;
+  color: #444444; /* Contraste con el fondo */
+}
+
+/* Estilo para los campos de entrada */
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group input[type="password"] {
+  width: 100%;
+  padding: 15px;
+  margin-top: 8px;
+  border-radius: 5px;
+  border: 1px solid #ddd; /* Bordes claros */
+  background-color: #f9f9f9; /* Fondo muy claro */
+  color: #333333; /* Texto oscuro dentro del input */
+  font-size: 1.1em;
+  box-sizing: border-box;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Estilo de los inputs al enfocar */
+.form-group input[type="text"]:focus,
+.form-group input[type="email"]:focus,
+.form-group input[type="password"]:focus {
+  outline: none;
+  border-color: #ffffff; /* Borde verde al enfocar */
+  box-shadow: 0 0 8px rgba(76, 175, 80, 0.3); /* Sombra verde */
+}
+
+/* Estilos para los botones */
+.form-button {
+  padding: 15px 25px;
+  font-size: 16px;
+  background-color: #ffffff; /* Verde claro */
+  color: #ffffff; /* Texto blanco */
+  border: none;
+  border-radius: 5px;
+  width: 100%;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.1s ease;
+}
+
+/* Efecto hover en el botón */
+.form-button:hover {
+  background-color: #ffffff; /* Cambio a verde más oscuro */
+}
+
+/* Efecto de presionado en el botón */
+.form-button:active {
+  transform: translateY(2px); /* Efecto de presionado */
+}
+
+/* Enlaces en los formularios */
+.form-switch, .form-link {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 1em;
+}
+
+.form-switch a, .form-link a {
+  color: #000000; /* Enlaces verdes */
+  text-decoration: none;
+  font-weight: bold;
+}
+
+/* Efecto hover en enlaces */
+.form-switch a:hover, .form-link a:hover {
+  text-decoration: underline;
+}
+
+/* Pie de página */
+.page-footer {
+  text-align: center;
+  padding: 15px 0;
+  background-color: #f1f1f1; /* Fondo claro */
+  color: #333;
+  font-size: 14px;
+}
