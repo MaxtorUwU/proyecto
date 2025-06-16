@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estructura de Horarios - Portal Estudiantil</title>
+    <link rel="stylesheet" href="EstructuraHorario.css"> <style>
+        /* Estilos básicos para ejemplo, asumiendo que EstructuraHorario.css tiene más */
+        body { font-family: sans-serif; margin: 0; background-color: #f4f4f4; color: #333; }
+        .navbar { background-color: #007bff; padding: 15px 0; }
+        .nav-container { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; align-items: center; }
+        .nav-logo { color: white; text-decoration: none; font-size: 1.5em; font-weight: bold; }
+        .nav-menu { list-style: none; margin: 0; padding: 0; display: flex; }
+        .nav-item { margin-left: 20px; }
+        .nav-link { color: white; text-decoration: none; padding: 5px 10px; border-radius: 4px; transition: background-color 0.3s ease; }
+        .nav-link:hover, .nav-link.active { background-color: #0056b3; }
+
+        .content-container { max-width: 1200px; margin: 20px auto; padding: 20px; background-color: #fff; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .title { text-align: center; color: #333; margin-bottom: 10px; }
+        .subtitle { text-align: center; color: #666; margin-bottom: 30px; }
+        .schedule-section { margin-bottom: 40px; }
+        .section-title { color: #007bff; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-bottom: 20px; text-align: center; }
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+        th { background-color: #f2f2f2; color: #333; }
+        .time-slot { background-color: #e9ecef; font-weight: bold; }
+        .asignatura { background-color: #e0f7fa; }
+        .receso { background-color: #ffe0b2; font-weight: bold; }
+        .almuerzo { background-color: #c8e6c9; font-weight: bold; }
+        .findesemana { background-color: #f8f9fa; color: #6c757d; font-style: italic; }
+        /* Clases específicas para asignaturas */
+        .taller { background-color: #d1c4e9; }
+        .tutoria { background-color: #f8bbd0; }
+        .laboratorio { background-color: #c5cae9; }
+        .electiva { background-color: #ffe082; }
+        .proyecto { background-color: #b3e5fc; }
+        .seminario { background-color: #ffccbc; }
+        .actividad { background-color: #cfd8dc; font-weight: bold; }
+
+        .daily-schedule-container { display: flex; flex-direction: column; gap: 10px; }
+        .daily-item { background-color: #e3f2fd; padding: 12px 15px; border-radius: 5px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+        .daily-item.receso { background-color: #ffe0b2; }
+        .daily-item.almuerzo { background-color: #c8e6c9; }
+        .daily-time { font-weight: bold; color: #007bff; min-width: 120px; }
+        .daily-activity { flex-grow: 1; text-align: right; }
+        .location { font-size: 0.9em; color: #555; margin-left: 10px; }
+
+        .page-footer { text-align: center; padding: 20px; margin-top: 40px; background-color: #333; color: white; font-size: 0.9em; }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="index.html" class="nav-logo">MiPortalEstudiantil</a>
+            <ul class="nav-menu">
+                <li class="nav-item"><a href="/horario" class="nav-link">Mi Horario</a></li>
+                <li class="nav-item"><a href="/estructura-horario" class="nav-link active">Estructura Horario</a></li>
+                <li class="nav-item"><a href="/disponibilidad" class="nav-link">Inscribir Asignaturas</a></li>
+                <li class="nav-item"><a href="/acceso" class="nav-link">Acceso</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <div class="content-container">
+        <h1 class="title">Estructura y Visualización de Horarios</h1>
+        <p class="subtitle">Aquí puedes ver la organización típica semanal y un ejemplo de la vista diaria detallada.</p>
+
+        <div class="schedule-section">
+            <h2 class="section-title">Vista Semanal del Horario</h2>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Horario</th>
+                            <th>Lunes</th>
+                            <th>Martes</th>
+                            <th>Miércoles</th>
+                            <th>Jueves</th>
+                            <th>Viernes</th>
+                            <th>Sábado</th>
+                            <th>Domingo</th>
+                        </tr>
+                    </thead>
+                    <tbody id="weekly-body">
+                        			<!-- Datos dinámicos insertados por JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="schedule-section">
+            <h2 class="section-title">Vista Diaria Detallada (Ejemplo: Lunes)</h2>
+            <div class="daily-schedule-container" id=daily-container">
+                <!-- Datos dinámicos insertados por JS -->
+            </div>
+        </div>
+
+    </div> <footer class="page-footer">
+        <p>© 2023 Portal Estudiantil. Todos los derechos reservados.</p>
+    </footer>
+    
+    
+<script>
+  document.addEventListener('DOMContentLoaded', async () => {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      alert("No has iniciado sesión");
+      window.location.href = "/acceso";
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/estructura-horario', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || 'Acceso denegado');
+        window.location.href = "/acceso";
+        return;
+      }
+
+      // Aquí puedes usar data.weeklySchedule y data.dailySchedule
+      // para construir la tabla y el detalle del día en el DOM
+
+    } catch (err) {
+      alert("Error al cargar el horario");
+    }
+  });
+</script>
+
+
+</body>
+</html>

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Disponibilidad de Asignaturas</title>
+    <link rel="stylesheet" href="Disponibilidad.css"> 
+    <style>
+        /* Basic CSS to make it presentable, assuming Disponibilidad.css has more */
+        body { font-family: sans-serif; margin: 20px; background-color: #f4f4f4; }
+        .title { text-align: center; color: #333; }
+        .content-container { background-color: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); max-width: 900px; margin: 20px auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #f2f2f2; }
+        .btn-inscribir {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .btn-inscribir:hover:not([disabled]) {
+            background-color: #0056b3;
+        }
+        .btn-inscribir[disabled] {
+            background-color: #6c757d;
+            cursor: not-allowed;
+        }
+        .no-cupos {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1 class="title">Disponibilidad de Asignaturas</h1>
+
+    <div class="content-container">
+        <p style="text-align: center; margin-bottom: 20px;">
+            Selecciona las asignaturas que deseas inscribir para el próximo período.
+        </p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Código</th>
+                    <th>Asignatura</th>
+                    <th>Créditos</th>
+                    <th>Cupos Disponibles</th>
+                    <th>Acción</th>
+                </tr>
+            </thead>
+            <tbody id="tabla-asignaturas">
+    				<!-- Se llenará dinámicamente -->
+	    </tbody>
+        </table>
+
+        <div style="text-align: center; margin-top: 30px;">
+            <button id="finalizarInscripcion" style="padding: 12px 30px; font-size: 1.1em;">Finalizar Inscripción</button>
+        </div>
+    </div>
+
+    <script>
+  async function cargarAsignaturas() {
+    const token = localStorage.getItem('token');
+
+    if (!token) {
+      alert("No has iniciado sesión");
+      window.location.href = "/acceso";
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/disponibilidad', {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || 'Error al obtener asignaturas');
+        return;
+      }
+
+      const tbody = document.getElementById('tabla-asignaturas');
+      tbody.innerHTML = '';
+
+      data.asignaturas.forEach(asig => {
+        const fila = document.createElement('tr');
+
+        fila.innerHTML = `
+          <td>${asig.codigo}</td>
+          <td>${asig.nombre}</td>
+          <td>${asig.creditos}</td>
+          <td ${asig.cupos_disponibles === 0 ? 'class="no-cupos"' : ''}>
+            ${asig.cupos_disponibles}
+          </td>
+          <td>
+            ${asig.cupos_disponibles > 0
+              ? `<button class="btn-inscribir" data-id="${asig.id_asignatura}">Inscribir</button>`
+              : `<button class="btn-inscribir" disabled>Completo</button>`}
+          </td>
+        `;
+
+        tbody.appendChild(fila);
+      });
+
+      // Asignar eventos a los botones "Inscribir"
+      document.querySelectorAll('.btn-inscribir:not([disabled])').forEach(boton => {
+        boton.addEventListener('click', async () => {
+          const id_asignatura = boton.dataset.id;
+          const originalText = boton.textContent;
+          boton.disabled = true;
+          boton.textContent = 'Inscribiendo...';
+
+          try {
+            const inscripcion = await fetch('/inscripciones', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: `Bearer ${token}`
+              },
+              body: JSON.stringify({ id_asignatura })
+            });
+
+            const resultado = await inscripcion.json();
+
+            if (inscripcion.ok) {
+              alert('Inscripción exitosa');
+              cargarAsignaturas(); // Recargar lista y actualizar cupos
+            } else {
+              alert(resultado.error || 'Error al inscribir');
+              boton.textContent = originalText;
+              boton.disabled = false;
+            }
+          } catch (err) {
+            console.error(err);
+            alert('Error al conectar con el servidor');
+            boton.textContent = originalText;
+            boton.disabled = false;
+          }
+        });
+      });
+
+    } catch (err) {
+      console.error(err);
+      alert("Error al cargar asignaturas");
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', cargarAsignaturas);
+  
+  // Redirigir al finalizar inscripción
+document.getElementById('finalizarInscripcion').addEventListener('click', () => {
+window.location.href = '/horario';
+});
+</script>
+
+
+</body>
+</html>
